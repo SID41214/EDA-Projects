@@ -9,55 +9,48 @@ Exploratory Data Analysis (EDA) is a crucial step in data science and analytics 
 - Identifying outliers and anomalies.
 - Analyzing correlations between variables.
 - Visualizing data trends and patterns for better insights.
+- Performing feature engineering and dimensionality reduction.
+- Scaling data for model readiness.
 
 ## 📦 Installation
 To perform EDA efficiently, install the necessary Python libraries:
 ```sh
-pip install pandas numpy matplotlib seaborn
+pip install pandas numpy matplotlib seaborn scikit-learn
 ```
 
-## 🔧 Getting Started
-### 1️⃣ Importing Required Libraries
+## 🔧 Steps in EDA
+### 1️⃣ Understanding the Data
 ```python
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-```
 
-### 2️⃣ Loading the Dataset
-```python
 df = pd.read_csv('data.csv')
+print(df.shape)  # Check the number of rows and columns
+print(df.head())  # Display first few rows
+print(df.info())  # Dataset structure and data types
 ```
 
-### 3️⃣ Basic Data Exploration
+### 2️⃣ Data Cleaning
 ```python
-print("Dataset Overview:")
-print(df.head())  # Display the first five rows
-print("\nDataset Information:")
-print(df.info())  # Display dataset structure and data types
-print("\nStatistical Summary:")
+# Check for missing values
+print(df.isnull().sum())
+
+# Handle missing values by filling with mean
+for col in df.select_dtypes(include=np.number).columns:
+    df[col].fillna(df[col].mean(), inplace=True)
+
+# Remove duplicate rows
+df.drop_duplicates(inplace=True)
+```
+
+### 3️⃣ Descriptive Statistics
+```python
 print(df.describe())  # Summary statistics of numerical columns
 ```
 
-### 4️⃣ Handling Missing Values
-```python
-print("Missing Values in Each Column:")
-print(df.isnull().sum())  # Check for missing values
-
-# Handling missing values using mean for numerical columns
-df.fillna(df.mean(), inplace=True)
-```
-
-### 5️⃣ Detecting Outliers
-```python
-plt.figure(figsize=(10,5))
-sns.boxplot(data=df)
-plt.title("Box Plot for Outlier Detection")
-plt.show()
-```
-
-### 6️⃣ Data Visualization
+### 4️⃣ Data Visualization
 #### Histogram for Distribution Analysis
 ```python
 plt.figure(figsize=(8,5))
@@ -78,7 +71,7 @@ plt.ylabel("Feature2")
 plt.show()
 ```
 
-### 7️⃣ Correlation Matrix
+### 5️⃣ Correlation Analysis
 ```python
 plt.figure(figsize=(12,6))
 sns.heatmap(df.corr(), annot=True, cmap='coolwarm', linewidths=0.5)
@@ -86,9 +79,55 @@ plt.title("Feature Correlation Matrix")
 plt.show()
 ```
 
+### 6️⃣ Outlier Detection
+```python
+plt.figure(figsize=(10,5))
+sns.boxplot(data=df)
+plt.title("Box Plot for Outlier Detection")
+plt.show()
+```
+
+### 7️⃣ Feature Engineering
+```python
+# Creating new feature: total_rooms
+if 'bedrooms' in df.columns and 'bathrooms' in df.columns:
+    df['total_rooms'] = df['bedrooms'] + df['bathrooms']
+```
+
+### 8️⃣ Dimensionality Reduction
+```python
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=2)
+df_pca = pca.fit_transform(df.select_dtypes(include=np.number))
+print("Explained Variance Ratio:", pca.explained_variance_ratio_)
+```
+
+### 9️⃣ Data Scaling
+```python
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+df_scaled = scaler.fit_transform(df.select_dtypes(include=np.number))
+```
+
+### 🔟 Initial Modeling
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+X = df.drop(columns=['target_column'])  # Replace with actual target column
+y = df['target_column']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+print("Model Score:", model.score(X_test, y_test))
+```
+
 ## 🤝 Contributing
 Contributions to improve this EDA guide are always welcome. Feel free to fork the repository and submit a pull request with your enhancements.
-
 
 
 ## 📬 Contact
